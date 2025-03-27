@@ -20,8 +20,8 @@ from langchain.prompts import PromptTemplate
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(
-    page_title="TEDIINVESTASI",
-    page_icon="📓",
+    page_title="TEDI INVESTASI",
+    page_icon="🔍",
     layout="wide"
 )
 
@@ -38,11 +38,11 @@ st.markdown(
 )
 
 # Judul Aplikasi
-st.title("📓TEMAN DISKUSI KEWIRAUSAHAAN")
+st.title("🗣️TEMAN DISKUSI KEWIRAUSAHAAN")
 st.markdown(
     """
     ### Selamat Datang di Asisten Pengetahuan Tentang **Portofolio INVESTASI & TIPU-TIPU DUNIA INVESTASI**
-    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, termasuk SCAM dan tipuan investasi lainnya. Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkanatas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.
+    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, termasuk SCAM dan tipuan investasi lainnya. Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkan atas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. **INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.**
     """
 )
 
