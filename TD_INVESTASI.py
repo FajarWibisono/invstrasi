@@ -20,7 +20,7 @@ os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(
     page_title="TEDIINVESTASI",
-    page_icon="📓",
+    page_icon="👥",
     layout="wide"
 )
 
@@ -37,7 +37,7 @@ st.markdown(
 )
 
 # Judul Aplikasi
-st.title("📓TEMAN DISKUSI KEWIRAUSAHAAN")
+st.title("🗣️TEMAN DISKUSI KEWIRAUSAHAAN")
 st.markdown(
     """
     ### Selamat Datang di Asisten Pengetahuan Tentang **Portofolio INVESTASI & TIPU-TIPU DUNIA INVESTASI**
@@ -129,6 +129,7 @@ if st.session_state.chain is None:
         st.session_state.chain = initialize_rag()
 
 import tempfile
+
 # ────
 # 6. FUNGSI ANALISIS PROPOSAL
 # ────
@@ -140,9 +141,14 @@ def analyze_proposal(file):
 
     # Load the PDF document from the temporary file
     loader = PyPDFLoader(temp_file_path)
-    document = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1233, chunk_overlap=234)
-    texts = text_splitter.split_documents([document])
+    documents = loader.load()  # This should return a list of documents
+
+    # Check if documents were loaded successfully
+    if not documents:
+        return "Tidak ada konten yang ditemukan dalam dokumen."
+
+    # Extract text from the loaded documents
+    texts = [doc.page_content for doc in documents]
 
     # Create a prompt for analysis
     analysis_prompt = f"""\
@@ -175,7 +181,7 @@ def analyze_proposal(file):
 
     result = st.session_state.chain({"question": analysis_prompt})
     return result.get('answer', 'Tidak ada jawaban yang dihasilkan.')
-
+    
 # ────
 # 7. ANTARMUKA CHAT
 # ────
