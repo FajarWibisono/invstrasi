@@ -133,65 +133,45 @@ import tempfile
 # ────
 # 6. FUNGSI ANALISIS PROPOSAL
 # ────
+# Function to analyze the uploaded PDF document
 def analyze_proposal(file):
-    try:
-        # Create a temporary file to save the uploaded PDF
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-            temp_file.write(file.read())
-            temp_file_path = temp_file.name
+    # Use the LLM model to analyze the document
+    analysis_result = analyze_document(file)
+    return analysis_result
 
-        # Load the PDF document from the temporary file
-        loader = PyPDFLoader(temp_file_path)
-        documents = loader.load()  # This should return a list of documents
+# Sidebar for file upload
+st.sidebar.title("Upload Proposal")
+uploaded_file = st.sidebar.file_uploader("Upload your PDF document", type=["pdf"])
 
-        # Check if documents were loaded successfully
-        if not documents:
-            return "Tidak ada konten yang ditemukan dalam dokumen."
+# Button to trigger analysis
+if st.sidebar.button("Analisis Proposal Investasi"):
+    if uploaded_file is not None:
+        # Analyze the uploaded document
+        analysis_result = analyze_proposal(uploaded_file)
 
-        # Extract text from the loaded documents
-        texts = [doc.page_content for doc in documents]
+        # Display the analysis results
+        st.subheader("Hasil Analisis Proposal Investasi")
 
-        # Combine the extracted texts into a single string
-        combined_text = "\n".join(texts)
+        # Displaying the analysis results
+        st.write("**1. ANALISIS RISIKO:**")
+        st.write("Risiko Finansial:", analysis_result['financial_risks'])
+        st.write("Risiko Operasional:", analysis_result['operational_risks'])
+        st.write("Risiko Pasar:", analysis_result['market_risks'])
+        st.write("Risiko Regulasi:", analysis_result['regulatory_risks'])
+        st.write("Risiko lainnya yang teridentifikasi:", analysis_result['other_risks'])
 
-        # Create a prompt for analysis
-        analysis_prompt = f"""\
-        Mohon analisis dengan detail berdasarkan konteks berikut:
+        st.write("**2. PERTANYAAN LANJUTAN:**")
+        st.write("Pertanyaan terkait model bisnis:", analysis_result['business_model_questions'])
+        st.write("Pertanyaan terkait keuangan:", analysis_result['financial_questions'])
+        st.write("Pertanyaan terkait tim manajemen:", analysis_result['management_team_questions'])
+        st.write("Pertanyaan terkait strategi:", analysis_result['strategy_questions'])
+        st.write("Pertanyaan terkait mitigasi risiko:", analysis_result['risk_mitigation_questions'])
 
-        {combined_text}
+        st.write("**3. Kesimpulan Umum:**")
+        st.write(analysis_result['conclusion'])
 
-        1. ANALISIS RISIKO:
-        - Risiko Finansial
-        - Risiko Operasional
-        - Risiko Pasar
-        - Risiko Regulasi
-        - Risiko lainnya yang teridentifikasi
-
-        2. KESIMPULAN UMUM:
-        - Potensi keuntungan
-        - Kelayakan bisnis
-        - Tingkat urgensi
-        - Kekuatan proposal
-        - Kelemahan proposal
-
-        3. PERTANYAAN LANJUTAN:
-        - Pertanyaan terkait model bisnis
-        - Pertanyaan terkait keuangan
-        - Pertanyaan terkait tim manajemen
-        - Pertanyaan terkait strategi
-        - Pertanyaan terkait mitigasi risiko
-
-        Berikan analisis yang objektif dan terstruktur.
-        """
-
-        result = st.session_state.chain({"question": analysis_prompt})
-        return result.get('answer', 'Tidak ada jawaban yang dihasilkan.')
-
-    except ValueError as ve:
-        return f"Terjadi kesalahan saat memproses dokumen: {str(ve)}"
-    except Exception as e:
-        return f"Kesalahan tidak terduga: {str(e)}"
-    
+    else:
+        st.warning("Silakan unggah dokumen PDF untuk analisis.")
 # ────
 # 7. ANTARMUKA CHAT
 # ────
