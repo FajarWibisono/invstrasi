@@ -1,15 +1,16 @@
 import streamlit as st
 import os
 
+# pip install streamlit langchain huggingface_hub sentence-transformers faiss-cpu
+
 from langchain_groq import ChatGroq
-from langchain.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
+from langchain.memory import ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
-
 
 # ────
 # 1. KONFIGURASI API & HALAMAN
@@ -20,7 +21,7 @@ os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 st.set_page_config(
     page_title="TEDIINVESTASI",
-    page_icon="👥",
+    page_icon="📓",
     layout="wide"
 )
 
@@ -37,11 +38,11 @@ st.markdown(
 )
 
 # Judul Aplikasi
-st.title("🗣️TEMAN DISKUSI KEWIRAUSAHAAN")
+st.title("📓TEMAN DISKUSI KEWIRAUSAHAAN")
 st.markdown(
     """
     ### Selamat Datang di Asisten Pengetahuan Tentang **Portofolio INVESTASI & TIPU-TIPU DUNIA INVESTASI**
-    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, termasuk SCAM dan tipuan investasi lainnya. Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkan atas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. **INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.**
+    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, termasuk SCAM dan tipuan investasi lainnya. Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkanatas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.
     """
 )
 
@@ -128,39 +129,29 @@ if st.session_state.chain is None:
     with st.spinner("Memuat sistem..."):
         st.session_state.chain = initialize_rag()
 
-import tempfile
+# ────
+# 6. FUNGSI ANALISIS PROPOSAL INVESTASI
+# ────
+def analyze_investment_proposal(uploaded_file):
+    if uploaded_file is not None:
+        pdf_loader = PyPDFLoader(uploaded_file)
+        document = pdf_loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1233, chunk_overlap=234)
+        texts = text_splitter.split_documents([document])
+
+        # Analyze the document using the LLM directly
+        analysis_prompt = """\
+        Mohon analisis hal berikut ini secara singkat dan padat:
+        ANALISIS RISIKO: Risiko Finansial, Risiko Operasional, Risiko Pasar, Risiko Regulasi, Risiko lainnya yang teridentifikasi.
+        PERTANYAAN LANJUTAN: Pertanyaan terkait model bisnis, Pertanyaan terkait keuangan, Pertanyaan terkait tim manajemen, Pertanyaan terkait strategi, Pertanyaan terkait mitigasi risiko.
+        Kesimpulan Umum: Berikan analisis yang objektif dan terstruktur.
+        """
+
+        result = st.session_state.chain({"question": analysis_prompt, "context": texts})
+        return result.get('answer', '')
 
 # ────
-# 6. FUNGSI ANALISIS PROPOSAL
-# ────
-# Function to analyze the uploaded PDF document
-def analyze_proposal(file):
-    # Use the LLM model to analyze the document
-    analysis_result = analyze_document(file)
-    return analysis_result
-
-        # Displaying the analysis results
-        st.write("**1. ANALISIS RISIKO:**")
-        st.write("Risiko Finansial:", analysis_result['financial_risks'])
-        st.write("Risiko Operasional:", analysis_result['operational_risks'])
-        st.write("Risiko Pasar:", analysis_result['market_risks'])
-        st.write("Risiko Regulasi:", analysis_result['regulatory_risks'])
-        st.write("Risiko lainnya yang teridentifikasi:", analysis_result['other_risks'])
-
-        st.write("**2. PERTANYAAN LANJUTAN:**")
-        st.write("Pertanyaan terkait model bisnis:", analysis_result['business_model_questions'])
-        st.write("Pertanyaan terkait keuangan:", analysis_result['financial_questions'])
-        st.write("Pertanyaan terkait tim manajemen:", analysis_result['management_team_questions'])
-        st.write("Pertanyaan terkait strategi:", analysis_result['strategy_questions'])
-        st.write("Pertanyaan terkait mitigasi risiko:", analysis_result['risk_mitigation_questions'])
-
-        st.write("**3. Kesimpulan Umum:**")
-        st.write(analysis_result['conclusion'])
-
-    else:
-        st.warning("Silakan unggah dokumen PDF untuk analisis.")
-# ────
-# 7. ANTARMUKA CHAT
+# 7. ANTARMUKA CHAT DAN UPLOAD FILE
 # ────
 if st.session_state.chain:
     # 7.1 Tampilkan riwayat chat
@@ -169,13 +160,14 @@ if st.session_state.chain:
             st.write(message["content"])
 
     # 7.2 Upload File
-    uploaded_file = st.file_uploader("Upload Tawaran Proposal Investasi (.pdf)", type="pdf")
+    uploaded_file = st.file_uploader("Upload Proposal Investasi (PDF)", type=["pdf"])
     if st.button("Analisis Proposal Investasi"):
         if uploaded_file is not None:
             with st.spinner("Menganalisis proposal..."):
-                analysis_result = analyze_proposal(uploaded_file)
-                st.markdown("### Hasil Analisis Proposal Investasi")
+                analysis_result = analyze_investment_proposal(uploaded_file)
                 st.write(analysis_result)
+        else:
+            st.error("Silakan unggah file PDF terlebih dahulu.")
 
     # 7.3 Chat Input
     prompt = st.chat_input("✍️tuliskan pertanyaan Anda tentang investasi disini")
