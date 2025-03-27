@@ -132,7 +132,7 @@ if st.session_state.chain is None:
 def analyze_proposal(file):
     loader = PyPDFLoader(file)
     document = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1233, chunk_overlap=234)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=999, chunk_overlap=99)
     texts = text_splitter.split_documents([document])
 
     # Create a prompt for analysis
@@ -177,7 +177,7 @@ if st.session_state.chain:
             st.write(message["content"])
 
     # 7.2 Upload File
-    uploaded_file = st.file_uploader("Upload Proposal Investasi (.pdf)", type="pdf")
+    uploaded_file = st.file_uploader("Upload Tawaran Proposal Investasi (.pdf)", type="pdf")
     if st.button("Analisis Proposal Investasi"):
         if uploaded_file is not None:
             with st.spinner("Menganalisis proposal..."):
