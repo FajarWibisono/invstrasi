@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+
 from langchain_groq import ChatGroq
 from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -8,6 +9,7 @@ from langchain.vectorstores import FAISS
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory, ConversationBufferWindowMemory
 from langchain.prompts import PromptTemplate
+
 
 # ────
 # 1. KONFIGURASI API & HALAMAN
@@ -126,13 +128,20 @@ if st.session_state.chain is None:
     with st.spinner("Memuat sistem..."):
         st.session_state.chain = initialize_rag()
 
+import tempfile
 # ────
 # 6. FUNGSI ANALISIS PROPOSAL
 # ────
 def analyze_proposal(file):
-    loader = PyPDFLoader(file)
+    # Create a temporary file to save the uploaded PDF
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+        temp_file.write(file.read())
+        temp_file_path = temp_file.name
+
+    # Load the PDF document from the temporary file
+    loader = PyPDFLoader(temp_file_path)
     document = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=999, chunk_overlap=99)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1233, chunk_overlap=234)
     texts = text_splitter.split_documents([document])
 
     # Create a prompt for analysis
