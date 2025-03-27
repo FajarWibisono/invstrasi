@@ -134,53 +134,63 @@ import tempfile
 # 6. FUNGSI ANALISIS PROPOSAL
 # ────
 def analyze_proposal(file):
-    # Create a temporary file to save the uploaded PDF
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-        temp_file.write(file.read())
-        temp_file_path = temp_file.name
+    try:
+        # Create a temporary file to save the uploaded PDF
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+            temp_file.write(file.read())
+            temp_file_path = temp_file.name
 
-    # Load the PDF document from the temporary file
-    loader = PyPDFLoader(temp_file_path)
-    documents = loader.load()  # This should return a list of documents
+        # Load the PDF document from the temporary file
+        loader = PyPDFLoader(temp_file_path)
+        documents = loader.load()  # This should return a list of documents
 
-    # Check if documents were loaded successfully
-    if not documents:
-        return "Tidak ada konten yang ditemukan dalam dokumen."
+        # Check if documents were loaded successfully
+        if not documents:
+            return "Tidak ada konten yang ditemukan dalam dokumen."
 
-    # Extract text from the loaded documents
-    texts = [doc.page_content for doc in documents]
+        # Extract text from the loaded documents
+        texts = [doc.page_content for doc in documents]
 
-    # Create a prompt for analysis
-    analysis_prompt = f"""\
-    Mohon analisis dengan detail:
-    1. ANALISIS RISIKO:
-    - Risiko Finansial
-    - Risiko Operasional
-    - Risiko Pasar
-    - Risiko Regulasi
-    - Risiko lainnya yang teridentifikasi
+        # Combine the extracted texts into a single string
+        combined_text = "\n".join(texts)
 
-    2. KESIMPULAN UMUM:
-    - Potensi keuntungan
-    - Kelayakan bisnis
-    - Tingkat urgensi
-    - Kekuatan proposal
-    - Kelemahan proposal
+        # Create a prompt for analysis
+        analysis_prompt = f"""\
+        Mohon analisis dengan detail berdasarkan konteks berikut:
 
-    3. PERTANYAAN LANJUTAN:
-    - Pertanyaan terkait model bisnis
-    - Pertanyaan terkait keuangan
-    - Pertanyaan terkait tim manajemen
-    - Pertanyaan terkait strategi
-    - Pertanyaan terkait mitigasi risiko
+        {combined_text}
 
-    Berikan analisis yang objektif dan terstruktur.
+        1. ANALISIS RISIKO:
+        - Risiko Finansial
+        - Risiko Operasional
+        - Risiko Pasar
+        - Risiko Regulasi
+        - Risiko lainnya yang teridentifikasi
 
-    Konteks: {texts}
-    """
+        2. KESIMPULAN UMUM:
+        - Potensi keuntungan
+        - Kelayakan bisnis
+        - Tingkat urgensi
+        - Kekuatan proposal
+        - Kelemahan proposal
 
-    result = st.session_state.chain({"question": analysis_prompt})
-    return result.get('answer', 'Tidak ada jawaban yang dihasilkan.')
+        3. PERTANYAAN LANJUTAN:
+        - Pertanyaan terkait model bisnis
+        - Pertanyaan terkait keuangan
+        - Pertanyaan terkait tim manajemen
+        - Pertanyaan terkait strategi
+        - Pertanyaan terkait mitigasi risiko
+
+        Berikan analisis yang objektif dan terstruktur.
+        """
+
+        result = st.session_state.chain({"question": analysis_prompt})
+        return result.get('answer', 'Tidak ada jawaban yang dihasilkan.')
+
+    except ValueError as ve:
+        return f"Terjadi kesalahan saat memproses dokumen: {str(ve)}"
+    except Exception as e:
+        return f"Kesalahan tidak terduga: {str(e)}"
     
 # ────
 # 7. ANTARMUKA CHAT
