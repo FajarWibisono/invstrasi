@@ -38,7 +38,7 @@ st.markdown(
 )
 
 # Judul Aplikasi
-st.title("📓TEMAN DISKUSI KEWIRAUSAHAAN")
+st.title("📓TEMAN NGOBROL INVESTASI")
 st.markdown(
     """
     ### Selamat Datang di Asisten Pengetahuan Tentang **Portofolio INVESTASI & TIPU-TIPU DUNIA INVESTASI**
