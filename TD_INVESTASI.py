@@ -139,9 +139,6 @@ def analyze_proposal(file):
     analysis_result = analyze_document(file)
     return analysis_result
 
-        # Display the analysis results
-        st.subheader("Hasil Analisis Proposal Investasi")
-
         # Displaying the analysis results
         st.write("**1. ANALISIS RISIKO:**")
         st.write("Risiko Finansial:", analysis_result['financial_risks'])
