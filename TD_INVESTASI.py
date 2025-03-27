@@ -4,7 +4,7 @@ import os
 # pip install streamlit langchain huggingface_hub sentence-transformers faiss-cpu
 
 from langchain_groq import ChatGroq
-from langchain.document_loaders import PyPDFLoader
+from langchain.document_loaders import PyPDFLoader, DirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.vectorstores import FAISS
@@ -130,59 +130,37 @@ if st.session_state.chain is None:
         st.session_state.chain = initialize_rag()
 
 # ────
-# 6. FUNGSI ANALISIS PROPOSAL INVESTASI
-# ────
-def analyze_investment_proposal(uploaded_file):
-    if uploaded_file is not None:
-        pdf_loader = PyPDFLoader(uploaded_file)
-        document = pdf_loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1233, chunk_overlap=234)
-        texts = text_splitter.split_documents([document])
-
-        # Analyze the document using the LLM directly
-        analysis_prompt = """\
-        Mohon analisis hal berikut ini secara singkat dan padat:
-        ANALISIS RISIKO: Risiko Finansial, Risiko Operasional, Risiko Pasar, Risiko Regulasi, Risiko lainnya yang teridentifikasi.
-        PERTANYAAN LANJUTAN: Pertanyaan terkait model bisnis, Pertanyaan terkait keuangan, Pertanyaan terkait tim manajemen, Pertanyaan terkait strategi, Pertanyaan terkait mitigasi risiko.
-        Kesimpulan Umum: Berikan analisis yang objektif dan terstruktur.
-        """
-
-        result = st.session_state.chain({"question": analysis_prompt, "context": texts})
-        return result.get('answer', '')
-
-# ────
-# 7. ANTARMUKA CHAT DAN UPLOAD FILE
+# 6. ANTARMUKA CHAT
 # ────
 if st.session_state.chain:
-    # 7.1 Tampilkan riwayat chat
+    # 6.1 Tampilkan riwayat chat
     for message in st.session_state.chat_history:
         with st.chat_message(message["role"]):
             st.write(message["content"])
 
-    # 7.2 Upload File
-    uploaded_file = st.file_uploader("Upload Proposal Investasi (PDF)", type=["pdf"])
-    if st.button("Analisis Proposal Investasi"):
-        if uploaded_file is not None:
-            with st.spinner("Menganalisis proposal..."):
-                analysis_result = analyze_investment_proposal(uploaded_file)
-                st.write(analysis_result)
-        else:
-            st.error("Silakan unggah file PDF terlebih dahulu.")
-
-    # 7.3 Chat Input
+    # 6.2 Chat Input
     prompt = st.chat_input("✍️tuliskan pertanyaan Anda tentang investasi disini")
     if prompt:
+        # Tambahkan pertanyaan user ke riwayat chat
         st.session_state.chat_history.append({"role": "user", "content": prompt})
+
+        # Limit the chat history to the last 5 messages
+        if len(st.session_state.chat_history) > 5:
+            st.session_state.chat_history = st.session_state.chat_history[-5:]
+
         with st.chat_message("user"):
             st.write(prompt)
 
-        # 7.4 Generate Response
+        # 6.3 Generate Response
         with st.chat_message("assistant"):
             with st.spinner("Mencari jawaban..."):
                 try:
+                    # Panggil chain
                     result = st.session_state.chain({"question": prompt})
+                    # Ambil jawaban
                     answer = result.get('answer', '')
                     st.write(answer)
+                    # Tambahkan ke riwayat
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
                 except Exception as e:
                     error_msg = f"Error generating response: {str(e)}"
@@ -190,7 +168,7 @@ if st.session_state.chain:
                     st.session_state.chat_history.append({"role": "assistant", "content": error_msg})
 
 # ────
-# 8. FOOTER & DISCLAIMER
+# 7. FOOTER & DISCLAIMER
 # ────
 st.markdown(
     """
