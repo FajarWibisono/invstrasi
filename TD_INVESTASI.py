@@ -139,16 +139,6 @@ def analyze_proposal(file):
     analysis_result = analyze_document(file)
     return analysis_result
 
-# Sidebar for file upload
-st.sidebar.title("Upload Proposal")
-uploaded_file = st.sidebar.file_uploader("Upload your PDF document", type=["pdf"])
-
-# Button to trigger analysis
-if st.sidebar.button("Analisis Proposal Investasi"):
-    if uploaded_file is not None:
-        # Analyze the uploaded document
-        analysis_result = analyze_proposal(uploaded_file)
-
         # Display the analysis results
         st.subheader("Hasil Analisis Proposal Investasi")
 
