@@ -42,7 +42,7 @@ st.title("🗣️TEMAN DISKUSI INVESTASI anti BODONG")
 st.markdown(
     """
     ### Selamat Datang di Asisten Pengetahuan Tentang **Portofolio INVESTASI & TIPU-TIPU DUNIA INVESTASI**
-    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, **termasuk SCAM dan tipuan investasi lainnya.** Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkan atas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. **INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.**
+    Chat Bot ini adalah TEMAN DISKUSI yang  akan membantu Anda memahami lebih dalam tentang aneka  investasi seperti Obligasi/Sukuk, Reksadana, Saham, dlsb. **termasuk SCAM dan tipuan investasi lainnya.** Pergunakanlah chatbot ini secara bijak, Segala keputusan investasi baik didasarkan atas hasil diskusi dengan chat bot ini maupun TIDAK adalah tanggung jawab pribadi masing-masing. **INGAT INVESTASI adalah aktivitas yang mengandung RISIKO!!!.**
     """
 )
 
